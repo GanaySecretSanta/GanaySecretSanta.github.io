@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Secret Santa ✨</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--paper:#f1e6cf;--ink:#231a14;--red:#d8332a;--blue:#1f5fbf;--green:#1f5e3a;--mus:#f0b92a;--gold:#c9a24a;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#1b2b3a;--ink:#f1e6cf;color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#1b2b3a;--ink:#f1e6cf;color-scheme:dark}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100vh;color:var(--ink);font-family:"Rockwell","Georgia",serif;text-align:center;overflow-x:hidden;background:radial-gradient(rgba(120,90,50,.16) 1px,transparent 1.3px) 0 0/9px 9px,radial-gradient(rgba(120,90,50,.1) 1px,transparent 1.3px) 4px 5px/13px 13px,var(--paper)}
+main{max-width:440px;margin:0 auto;padding:16px 14px 40px;position:relative;z-index:2}
+h1{font-weight:900;font-size:2rem;margin:10px 0;color:var(--red);text-shadow:3px 3px 0 var(--blue);transform:rotate(-1.5deg)}
+h1.title{font-size:3rem;line-height:1;margin-bottom:2px}
+.sub{letter-spacing:2px;font-size:.95rem;color:var(--green);font-weight:bold}
+p{margin:8px 0}.muted{opacity:.85;font-size:.92rem}
+.band{height:12px;margin:12px 0;background:repeating-linear-gradient(90deg,var(--red) 0 12px,var(--paper) 12px 16px,var(--blue) 16px 28px,var(--paper) 28px 32px,var(--green) 32px 44px,var(--paper) 44px 48px,var(--mus) 48px 60px,var(--paper) 60px 64px);border:2px solid #1a1a1a}
+.hero{width:100%;max-width:250px;height:auto;display:block;margin:8px auto 0}
+.cap{display:inline-block;background:var(--mus);color:#231a14;border:3px solid #1a1a1a;padding:4px 12px;font-weight:bold;font-size:.85rem;box-shadow:3px 3px 0 #1a1a1a;transform:rotate(1deg)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+button{font:inherit;font-weight:bold;cursor:pointer;border:3px solid #1a1a1a;border-radius:10px;padding:12px 8px;background:var(--red);color:#fff6e0;box-shadow:3px 3px 0 #1a1a1a;font-size:1.05rem}
+button:active{transform:translate(3px,3px);box-shadow:0 0 0 #1a1a1a}
+.grid button:nth-child(4n+2){background:var(--blue)}.grid button:nth-child(4n+3){background:var(--green)}.grid button:nth-child(4n){background:var(--mus);color:#231a14}
+.row{display:flex;gap:10px;justify-content:center;margin-top:16px}.hide{display:none}
+#wrap{position:relative;width:100%;max-width:320px;height:360px;margin:16px auto 0;border:4px solid #1a1a1a;box-shadow:6px 6px 0 var(--blue);overflow:hidden;background:#f1e6cf}
+#res{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;color:#231a14;background:radial-gradient(rgba(201,162,74,.5) 2px,transparent 2.4px) 0 0/16px 16px,#f1e6cf}
+#res:after{content:"";position:absolute;inset:8px;border:2px dashed var(--red);pointer-events:none}
+#res .t{font-size:1rem;font-weight:bold}#res .n{font-size:2.5rem;font-weight:900;color:var(--red);text-shadow:3px 3px 0 var(--blue);margin:8px 0;word-break:break-word}#res .e{font-size:3rem}
+canvas{position:absolute;inset:0;touch-action:none;cursor:grab}
+.flake{position:fixed;top:-20px;z-index:1;pointer-events:none;animation:fall linear infinite;opacity:.8;color:var(--gold)}
+@keyframes fall{to{transform:translateY(110vh) rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.flake{display:none}}
+.pop{animation:pop .6s ease}@keyframes pop{0%{transform:scale(.7)}60%{transform:scale(1.12)}100%{transform:scale(1)}}
+.boom{position:fixed;left:50%;top:36%;width:250px;height:250px;margin:-125px 0 0 -125px;z-index:9;pointer-events:none;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--mus);border:5px solid #1a1a1a;box-shadow:6px 6px 0 var(--blue);font-size:2.3rem;font-weight:900;color:var(--red);text-shadow:2px 2px 0 #1a1a1a;animation:boom 1.5s ease-out forwards}
+@keyframes boom{0%{transform:scale(.2) rotate(-15deg);opacity:0}25%{transform:scale(1) rotate(4deg);opacity:1}80%{opacity:1}100%{transform:scale(1.2);opacity:0}}
+#pin{font:inherit;font-size:1.6rem;letter-spacing:.5em;text-align:center;width:9em;padding:10px;border-radius:10px;border:3px solid #1a1a1a;background:#f1e6cf;color:#231a14;margin-top:12px;box-shadow:3px 3px 0 #1a1a1a}
+</style></head><body>
+<main>
+<div id="s1">
+<h1 class="title">Secret Santa</h1>
+<div class="sub">✦ le tirage au sort de Noël ✦</div>
+<div id="strip"></div>
+<p>Ho ho ho ! Qui es-tu ?</p>
+<p class="muted">Choisis ton prénom, puis gratte le Père Noël pour découvrir à qui tu offres un cadeau.</p>
+<div class="grid" id="names"></div>
+</div>
+<div id="s2" class="hide">
+<div id="c2" style="width:80px;margin:14px auto"></div>
+<h1 id="who"></h1>
+<p>Entre ton code secret à 4 chiffres (celui qu’on t’a envoyé). Pas de triche, le Père Noël a une liste ! 📜</p>
+<input id="pin" type="password" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="••••">
+<p id="err" class="muted" style="color:var(--red);min-height:1.4em"></p>
+<div class="row"><button class="go" id="yes">C’est moi !</button><button id="no">Retour</button></div>
+</div>
+<div id="s3" class="hide">
+<div class="cap">Au fond de la forêt enneigée…</div>
+<h1 id="hello"></h1>
+<p id="hint">Gratte le Père Noël avec ton doigt 👆</p>
+<div id="wrap"><div id="res"><div class="e">🎁</div><div class="t">Tu offres un cadeau à…</div><div class="n" id="target"></div><div class="t" id="joke"></div></div><canvas id="cv"></canvas></div>
+<p class="muted" style="margin-top:16px">C’est définitif : si tu reviens, ce sera toujours la même personne. Chut, c’est un secret ! 🤫</p>
+<div class="row"><button id="back">Retour</button></div>
+</div>
+</main>
+<script>
+var DATA={"Laurenne": {"c": "c900dcdaebc37cbe", "v": "186c1643e00810fa"}, "Édouard": {"c": "8cac59", "v": "01b4b8899df559e8"}, "Luc": {"c": "677da5463f", "v": "bd62263f93449710"}, "Laura": {"c": "6eccd521", "v": "42feb38d358c1ebf"}, "Paul": {"c": "bcddcca3", "v": "cecfed1f1d82f28a"}, "Fred": {"c": "e6d696a13db61a", "v": "c2632bb252fa2622"}, "Thibaut": {"c": "192ace59cc939a", "v": "230a8724e591cf89"}, "Armelle": {"c": "19a0df0ac45d", "v": "a2efb896d3a57700"}, "Arthur": {"c": "2626c420dd", "v": "97f795e32577a90c"}, "Inès": {"c": "6144ade61e", "v": "a8fca9f22c068ffc"}, "Gabin": {"c": "d7fdc2a628a2c3b791", "v": "f04497449cc08d68"}, "Alexandre": {"c": "7c363b96750b", "v": "c87fa78ae18d06ab"}, "Louise": {"c": "719f026daa0820f8", "v": "3866589a55276976"}, "Raphaël": {"c": "0377b31d6b", "v": "644ec0994848eca6"}, "Nelsa": {"c": "25e1b6dffd27bb98", "v": "b71f41b467158dcb"}};
+var NAMES=Object.keys(DATA).sort(function(a,b){return a.localeCompare(b,"fr")});
+var JOKES=["Prépare ton plus beau papier cadeau !","Le Père Noël compte sur toi 🎄","Pas de chèque-cadeau, hein ! 😜","Motus et bouche cousue 🤐","Même les rennes sont au courant… 🦌"];
+var $=function(i){return document.getElementById(i)};
+var cur=null;
+function show(id){["s1","s2","s3"].forEach(function(s){$(s).classList.toggle("hide",s!==id)})}
+NAMES.forEach(function(n){var b=document.createElement("button");b.textContent=n;b.onclick=function(){cur=n;$("who").textContent=n+" ?";$("pin").value="";$("err").textContent="";show("s2");$("pin").focus()};$("names").appendChild(b)});
+$("no").onclick=function(){show("s1")};$("back").onclick=function(){show("s1")};
+$("pin").addEventListener("keydown",function(e){if(e.key==="Enter")$("yes").click()});
+$("yes").onclick=async function(){
+  var pin=$("pin").value.trim(),e=DATA[cur],te=new TextEncoder();
+  function hex(a){return Array.from(a).map(function(x){return("0"+x.toString(16)).slice(-2)}).join("")}
+  try{
+    var km=await crypto.subtle.importKey("raw",te.encode(pin),"PBKDF2",false,["deriveBits"]);
+    var kb=new Uint8Array(await crypto.subtle.deriveBits({name:"PBKDF2",hash:"SHA-256",salt:te.encode("santa:"+cur),iterations:100000},km,256));
+    var vb=new Uint8Array(await crypto.subtle.digest("SHA-256",new Uint8Array(Array.from(kb).concat([118]))));
+    if(hex(vb).slice(0,16)!==e.v){$("err").textContent="Mauvais code ! Le Père Noël ne se laisse pas avoir 🎅";$("pin").value="";return}
+    var cb=e.c.match(/../g).map(function(x){return parseInt(x,16)});
+    $("target").textContent=new TextDecoder().decode(Uint8Array.from(cb.map(function(b,i){return b^kb[i]})));
+  }catch(x){$("err").textContent="Oups, ça n’a pas marché. Réessaie dans un navigateur à jour.";return}
+  $("hello").textContent="Salut "+cur+" !";
+  $("joke").textContent=JOKES[NAMES.indexOf(cur)%JOKES.length];
+  $("hint").textContent="Gratte le Père Noël avec ton doigt 👆";
+  $("res").classList.remove("pop");
+  show("s3");setupCanvas();
+};
+var cv=$("cv"),ctx,drawing=false,done=false,moves=0;
+function santa(w,h){
+  var cx=w/2,L="#1a1a1a";ctx.globalCompositeOperation="source-over";ctx.fillStyle="#f1e6cf";ctx.fillRect(0,0,w,h);
+  ctx.fillStyle="rgba(120,90,50,.14)";for(var i=0;i<300;i++)ctx.fillRect((i*97)%w,(i*53)%h,1.6,1.6);
+  var P=[[0,-60],[-34,-8],[-18,-8],[-50,40],[-28,40],[-62,90],[62,90],[28,40],[50,40],[18,-8],[34,-8]];
+  function tree(x,y,s,f,st){ctx.beginPath();P.forEach(function(q,i){ctx[i?"lineTo":"moveTo"](x+q[0]*s,y+q[1]*s)});ctx.closePath();ctx.fillStyle=f;ctx.fill();if(st){ctx.lineWidth=7*s;ctx.lineJoin="miter";ctx.strokeStyle=st;ctx.stroke()}}
+  function sf(x,y,r){ctx.strokeStyle="#c9a24a";ctx.lineWidth=3;ctx.lineCap="round";for(var a=0;a<3;a++){var t=a*Math.PI/3;ctx.beginPath();ctx.moveTo(x-Math.cos(t)*r,y-Math.sin(t)*r);ctx.lineTo(x+Math.cos(t)*r,y+Math.sin(t)*r);ctx.stroke()}}
+  function fs(f,s){ctx.fillStyle=f;ctx.fill();ctx.lineWidth=4;ctx.strokeStyle=s||L;ctx.lineJoin="round";ctx.stroke()}
+  sf(40,52,16);sf(w-40,46,14);sf(w-36,136,9);tree(w-50,100,.3,"#c9a24a");
+  tree(44,200,.55,"#1f5e3a");tree(41,196,.55,"#1f5fbf","#1f5e3a");
+  ctx.beginPath();ctx.moveTo(cx-55,128);ctx.quadraticCurveTo(cx,114,cx+55,128);ctx.lineTo(cx+100,262);ctx.quadraticCurveTo(cx,282,cx-100,262);ctx.closePath();fs("#1f5fbf");
+  ctx.strokeStyle="#fff6e0";ctx.lineWidth=1.4;for(var y=140;y<262;y+=12)for(var x=cx-100;x<cx+100;x+=13){var hf=52+(y-128)/134*44;var xx=x+(y/12%2)*6;if(Math.abs(xx-cx)<hf){ctx.beginPath();ctx.arc(xx,y,4,.3,5.2);ctx.stroke()}}
+  ctx.beginPath();ctx.moveTo(cx-100,262);ctx.quadraticCurveTo(cx,282,cx+100,262);ctx.lineTo(cx+103,277);ctx.quadraticCurveTo(cx,299,cx-103,277);ctx.closePath();fs("#fff6e0");
+  ctx.beginPath();ctx.ellipse(cx+112,232,26,32,.2,0,7);fs("#f0b92a");ctx.beginPath();ctx.arc(cx+84,204,10,0,7);fs("#d8332a");
+  ctx.beginPath();ctx.arc(cx,98,28,0,7);fs("#f4c9a0");
+  ctx.fillStyle=L;ctx.beginPath();ctx.arc(cx-10,94,2.6,0,7);ctx.arc(cx+10,94,2.6,0,7);ctx.fill();
+  ctx.beginPath();ctx.moveTo(cx-28,104);ctx.quadraticCurveTo(cx-40,192,cx,208);ctx.quadraticCurveTo(cx+40,192,cx+28,104);ctx.quadraticCurveTo(cx,126,cx-28,104);ctx.closePath();fs("#fff6e0");
+  ctx.beginPath();ctx.arc(cx,104,5,0,7);fs("#d8332a");
+  ctx.beginPath();ctx.moveTo(cx-35,84);ctx.quadraticCurveTo(cx-40,14,cx,12);ctx.quadraticCurveTo(cx+40,14,cx+35,84);ctx.closePath();fs("#d8332a");
+  ctx.beginPath();ctx.ellipse(cx,82,40,11,0,0,7);fs("#fff6e0");
+  ctx.fillStyle="#f0b92a";ctx.font="24px Georgia";ctx.textAlign="center";ctx.fillText("★",cx,60);
+  ctx.fillStyle="#d8332a";ctx.fillRect(22,300,w-44,42);ctx.strokeStyle=L;ctx.lineWidth=4;ctx.strokeRect(22,300,w-44,42);
+  ctx.fillStyle="#fff6e0";ctx.font="900 24px Rockwell,Georgia,serif";ctx.fillText("GRATTE-MOI !",cx,329);
+  ctx.strokeStyle=L;ctx.lineWidth=4;ctx.strokeRect(2,2,w-4,h-4);
+}
+function setupCanvas(){
+  var wrap=$("wrap"),w=wrap.clientWidth,h=wrap.clientHeight;
+  cv.width=w;cv.height=h;cv.style.display="block";cv.style.opacity=1;
+  ctx=cv.getContext("2d");done=false;moves=0;santa(w,h);
+}
+function pos(e){var r=cv.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top]}
+function scratch(e){
+  if(!drawing||done)return;var p=pos(e);
+  ctx.globalCompositeOperation="destination-out";ctx.beginPath();ctx.arc(p[0],p[1],26,0,7);ctx.fill();
+  if(++moves%6===0)check();
+}
+function check(){
+  var w=cv.width,h=cv.height,d=ctx.getImageData(0,0,w,h).data,c=0,t=0;
+  for(var i=3;i<d.length;i+=64){t++;if(d[i]<40)c++}
+  if(c/t>0.5)finish();
+}
+function finish(){
+  done=true;cv.style.transition="opacity .5s";cv.style.opacity=0;
+  setTimeout(function(){cv.style.display="none"},520);
+  $("res").classList.add("pop");$("hint").textContent="Ho ho ho ! 🎉 Voilà ton secret.";
+  boom();confetti();
+}
+cv.addEventListener("pointerdown",function(e){drawing=true;cv.setPointerCapture(e.pointerId);scratch(e)});
+cv.addEventListener("pointermove",scratch);
+cv.addEventListener("pointerup",function(){drawing=false;if(!done)check()});
+cv.addEventListener("pointercancel",function(){drawing=false});
+function flake(ch,left,dur,size){var f=document.createElement("div");f.className="flake";f.textContent=ch;f.style.left=left+"%";f.style.fontSize=size+"px";f.style.animationDuration=dur+"s";document.body.appendChild(f);return f}
+for(var i=0;i<14;i++)flake("❄",Math.random()*100,8+Math.random()*8,12+Math.random()*14).style.animationDelay=(-Math.random()*10)+"s";
+function confetti(){var E=["❄️","⭐","🎄","🎁","🔔"];for(var i=0;i<24;i++){var f=flake(E[i%5],Math.random()*100,2+Math.random()*2,20+Math.random()*14);f.style.animationIterationCount="1";setTimeout(function(x){x.remove()}.bind(null,f),4500)}}
+
+$("strip").innerHTML='<svg class="hero" viewBox="0 0 300 330"><defs><pattern id="cu" width="12" height="12" patternUnits="userSpaceOnUse"><path d="M2 8c0-6 8-6 8 0 0 4-5 4-5 1" fill="none" stroke="#fff6e0" stroke-width="1.4"/></pattern><g id="sf" stroke="#c9a24a" stroke-width="3" stroke-linecap="round" fill="none"><path d="M0-14V14M-12-7L12 7M-12 7L12-7"/></g><path id="fir" d="M0-30L-18 0H-8L-24 26H24L8 0H18Z"/></defs><use href="#sf" x="42" y="70"/><use href="#sf" transform="translate(262 60) scale(1.3)"/><use href="#sf" x="262" y="190"/><use href="#fir" transform="translate(246 140) scale(.8)" fill="#c9a24a"/><use href="#fir" transform="translate(40 250) scale(.6)" fill="#c9a24a"/><g transform="translate(40 -18) rotate(-24 140 150)"><path d="M99 14L74 64H89L62 116H80L48 174H150L118 116H136L109 64H124Z" fill="#1f5e3a"/><path d="M95 10L70 60H85L58 112H76L44 170H146L114 112H132L105 60H120Z" fill="#1f5fbf" stroke="#1f5e3a" stroke-width="5"/></g><path d="M118 124Q150 114 182 124L222 268Q150 284 78 268Z" fill="#1f5fbf" stroke="#1a1a1a" stroke-width="4"/><path d="M118 124Q150 114 182 124L222 268Q150 284 78 268Z" fill="url(#cu)"/><path d="M78 268Q150 284 222 268L224 282Q150 298 76 282Z" fill="#fff6e0" stroke="#1a1a1a" stroke-width="3"/><path d="M100 288h28v22l16 8c4 10-4 14-14 14H92c-6-6-2-12 4-14z" fill="#d8332a" stroke="#1a1a1a" stroke-width="3"/><path d="M158 288h28v22l16 8c4 10-4 14-14 14h-38c-6-6-2-12 4-14z" fill="#d8332a" stroke="#1a1a1a" stroke-width="3"/><circle cx="150" cy="106" r="19" fill="#f4c9a0" stroke="#1a1a1a" stroke-width="3"/><circle cx="143" cy="102" r="2" fill="#1a1a1a"/><circle cx="158" cy="102" r="2" fill="#1a1a1a"/><circle cx="150" cy="110" r="4" fill="#d8332a"/><path d="M133 112Q150 162 167 112Q150 124 133 112Z" fill="#fff6e0" stroke="#1a1a1a" stroke-width="3"/><path d="M126 96Q128 48 150 48Q174 48 174 96Z" fill="#d8332a" stroke="#1a1a1a" stroke-width="3"/><rect x="122" y="90" width="56" height="13" rx="6" fill="#fff6e0" stroke="#1a1a1a" stroke-width="3"/><circle cx="150" cy="70" r="4" fill="#f0b92a"/><path d="M205 196q42 8 38 62-22 24-50 8-10-40 12-70z" fill="#f0b92a" stroke="#1a1a1a" stroke-width="4"/><path d="M198 204q14-16 30-6" fill="none" stroke="#d8332a" stroke-width="6"/><circle cx="202" cy="204" r="9" fill="#d8332a" stroke="#1a1a1a" stroke-width="3"/></svg>'+'<div class="band"></div>';
+$("c2").innerHTML='<svg viewBox="-40 -40 80 100"><path d="M0-34L-20 0H-9L-27 30H27L9 0H20Z" fill="#1f5e3a" transform="translate(3 3)"/><path d="M0-34L-20 0H-9L-27 30H27L9 0H20Z" fill="#1f5fbf" stroke="#1f5e3a" stroke-width="3"/><rect x="-5" y="30" width="10" height="12" fill="#d8332a" stroke="#1a1a1a" stroke-width="2"/><text x="0" y="-36" text-anchor="middle" font-size="16" fill="#f0b92a">★</text></svg>';
+function boom(){var b=document.createElement("div");b.className="boom";b.textContent="Ho ho ho !";document.body.appendChild(b);setTimeout(function(){b.remove()},1600)}
+</script></body></html>
